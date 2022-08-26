@@ -32,6 +32,8 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define TRUNCATE_JSON_CUSTOM(val, multiplier) ((int) (val * multiplier))
+#define TRUNCATE_JSON(val) TRUNCATE_JSON_CUSTOM(val, 1000.)
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -128,16 +130,16 @@ int main(void) {
         HAL_StatusTypeDef rc = MPU6050_Read_All(&hi2c1, &mpu);
 
         HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
-        spi_tx_json("{\"accel\":{\"x\":", (int) (mpu.Ax * 1000.), false);
-        spi_tx_json(",\"y\":", (int) (mpu.Ay * 1000.), false);
-        spi_tx_json(",\"z\":", (int) (mpu.Az * 1000.), false);
-        spi_tx_json("},\"gyro\":{\"x\":", (int) (mpu.Gx * 1000.), false);
-        spi_tx_json(",\"y\":", (int) (mpu.Gy * 1000.), false);
-        spi_tx_json(",\"z\":", (int) (mpu.Gz * 1000.), false);
-        spi_tx_json("},\"kalman\":{\"x\":", (int) (mpu.KalmanAngleX * 1000.), false);
-        spi_tx_json(",\"y\":", (int) (mpu.KalmanAngleY * 100.), false);
+        spi_tx_json("{\"accel\":{\"x\":", TRUNCATE_JSON(mpu.Ax), false);
+        spi_tx_json(",\"y\":", TRUNCATE_JSON(mpu.Ay), false);
+        spi_tx_json(",\"z\":", TRUNCATE_JSON(mpu.Az), false);
+        spi_tx_json("},\"gyro\":{\"x\":", TRUNCATE_JSON(mpu.Gx), false);
+        spi_tx_json(",\"y\":", TRUNCATE_JSON(mpu.Gy), false);
+        spi_tx_json(",\"z\":", TRUNCATE_JSON(mpu.Gz), false);
+        spi_tx_json("},\"kalman\":{\"x\":", TRUNCATE_JSON(mpu.KalmanAngleX), false);
+        spi_tx_json(",\"y\":", TRUNCATE_JSON(mpu.KalmanAngleY), false);
         spi_tx_json("},\"misc\":{\"status\":", (int) rc, false);
-        spi_tx_json(",\"temp\":", (int) (mpu.Temperature * 10.), false);
+        spi_tx_json(",\"temp\":", TRUNCATE_JSON_CUSTOM(mpu.Temperature, 10.), false);
         spi_tx_json("}}", 0, true);
         HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_SET);
 
